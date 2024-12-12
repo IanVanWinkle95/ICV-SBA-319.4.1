@@ -9,12 +9,10 @@ const path = require('path')
 
 const app = express()
 app.use(express.json())
+app.use(cors())
 const mongoURI = process.env.MONGODB_URI
 
 app.use(express.static(path.join(__dirname, 'public')))
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'))
-})
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
@@ -24,9 +22,17 @@ mongoose.connect(process.env.MONGO_URI, {
 .then(() => console.log('MongoDB connected'))
 .catch((err) => console.error(err))
 
+const toDoDisplay = new mongoose.Schema({
+  task: stringify,
+  completed: Boolean
+})
+
 // Routes
 const toDoRoutes = require('../routes/toDo.js')
 app.use('/toDo', toDoRoutes)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'))
+})
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
